@@ -7,7 +7,7 @@ io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     // 2. รอรับข้อความ (ชื่อช่อง 'message')
-    socket.on('message', (msg) => {
+    socket.on('chat message', (msg) => {
         console.log('ข้อความเข้า:', msg); // โชว์ใน Log ให้เราเห็น
         io.emit('message', msg);         // ส่งต่อให้ทุกคนในห้องเห็น
     });
