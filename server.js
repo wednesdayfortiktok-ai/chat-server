@@ -3,13 +3,23 @@ const io = require('socket.io')(3000, {
 });
 
 io.on('connection', (socket) => {
-    // 1. แจ้งเตือนเมื่อมีคนเข้า
     console.log('User connected:', socket.id);
 
-    // 2. รอรับข้อความ (ชื่อช่อง 'message')
+    // ฟังก์ชันกระจายข่าว (ส่งมันทั้ง 2 ชื่อเลย กันพลาด)
+    const broadcastMessage = (msg) => {
+        console.log('Broadcasting:', msg);
+        io.emit('chat message', msg); // ส่งให้แอปเวอร์ชั่นใหม่
+        io.emit('message', msg);      // ส่งให้แอปเวอร์ชั่นเก่า
+    };
+
+    // 1. ถ้าแอปส่งมาชื่อ 'chat message'
     socket.on('chat message', (msg) => {
-        console.log('ข้อความเข้า:', msg); // โชว์ใน Log ให้เราเห็น
-        io.emit('message', msg);         // ส่งต่อให้ทุกคนในห้องเห็น
+        broadcastMessage(msg);
+    });
+
+    // 2. ถ้าแอปส่งมาชื่อ 'message'
+    socket.on('message', (msg) => {
+        broadcastMessage(msg);
     });
 });
 
