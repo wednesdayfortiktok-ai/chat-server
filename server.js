@@ -1,14 +1,16 @@
-const io = require('socket.io')(3000, { cors: { origin: '*' } });
-let inbox = {};
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  socket.on('join', (id) => { inbox[id] = inbox[id] || []; });
-  socket.on('send_offline', (data) => {
-    if (inbox[data.targetId]) inbox[data.targetId].push(data.encryptedContent);
-  });
-  socket.on('check_inbox', (id) => {
-    socket.emit('receive_offline', inbox[id] || []);
-    inbox[id] = [];
-  });
+const io = require('socket.io')(3000, {
+    cors: { origin: '*' }
 });
+
+io.on('connection', (socket) => {
+    // 1. แจ้งเตือนเมื่อมีคนเข้า
+    console.log('User connected:', socket.id);
+
+    // 2. รอรับข้อความ (ชื่อช่อง 'message')
+    socket.on('message', (msg) => {
+        console.log('ข้อความเข้า:', msg); // โชว์ใน Log ให้เราเห็น
+        io.emit('message', msg);         // ส่งต่อให้ทุกคนในห้องเห็น
+    });
+});
+
 console.log('Server started on port 3000');
